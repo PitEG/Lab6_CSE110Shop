@@ -1,7 +1,7 @@
 // product-item.js
 
 class ProductItem extends HTMLElement {
-  constructor(list, link, img, pTitle, pPrice, button) {
+  constructor(list, link, img, pTitle, pPrice, button, inCart, productId) {
     super();
 
     this.attachShadow({mode : 'open'});
@@ -32,16 +32,52 @@ class ProductItem extends HTMLElement {
 
     this.shadowRoot.append(this.list);
     this.shadowRoot.append(this.link);
+
+    this.inCart = false;
+    this.productId = 0;
+
+    this.button.onclick = function(el){ 
+      //get cart count
+      let cartCountElement = document.getElementById('cart-count');
+      let cartCount = parseInt(cartCountElement.textContent);
+
+      let button = el.toElement;
+      let id = el.toElement.parentElement.id;
+
+      //cart contents
+      let cartContents = JSON.parse(localStorage.getItem("ids"));
+      let inCart = cartContents[id];
+
+      //change it depending on in cart status
+      if (inCart) {
+        cartCount--;
+        cartContents[id] = false;
+        button.textContent = 'Add to Cart'
+      }
+      else {
+        cartCount++;
+        cartContents[id] = true;
+        button.textContent = 'Remove from Cart'
+      }
+
+      //reflect on cart count element
+      cartCountElement.textContent = "" + cartCount;
+      localStorage.setItem("ids", JSON.stringify(cartContents));
+    }
   }
 
-  fill(imgSrc, title, price) {
+  fill(imgSrc, title, price, id) {
     this.img.setAttribute('src', imgSrc);
     this.img.setAttribute('alt', title);
 
-    this.textContent = "$" + price; 
+    this.pPrice.textContent = "$" + price; 
     this.pTitle.textContent = title;
 
-    //button.setAttribute('onclick', alert('Added to Cart!'))
+    this.productId = id;
+    this.list.setAttribute('id', id);
+    if (JSON.parse(localStorage.getItem("ids"))[id] == true) {
+      this.button.textContent = 'Remove From Cart';
+    }
   }
 }
 
