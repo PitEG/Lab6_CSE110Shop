@@ -1,12 +1,12 @@
 // Script.js
 
 function populateWithProducts() {
-  let objects = JSON.parse(localStorage.getItem("products"));
+  let products = JSON.parse(localStorage.getItem("products"));
   let ids = JSON.parse(localStorage.getItem('ids'));
   //make a new list of ids of items in cart
   if (ids == null) {
     let ids = new Array;
-    for (let i = 0; i < objects.length + 1; i++) {
+    for (let i = 0; i < products.length + 1; i++) {
       ids.push(false);
     }
     localStorage.setItem("ids", JSON.stringify(ids));
@@ -21,8 +21,8 @@ function populateWithProducts() {
   }
 
   //populate product list
-  for (let i = 0; i < objects.length; i++) {
-    let product = objects[i];
+  for (let i = 0; i < products.length; i++) {
+    let product = products[i];
     let productElement = document.createElement('product-item');
     productElement.fill(product['image'], product['title'], product['price'], product['id']);
     document.getElementById('product-list').appendChild(productElement);
@@ -33,6 +33,8 @@ window.addEventListener('DOMContentLoaded', () => {
   // TODO
   fetch("https://fakestoreapi.com/products")
     .then(response => response.json())
-    .then(data => localStorage.setItem("products", JSON.stringify(data)));
-  populateWithProducts();
+    .then(data => { 
+      localStorage.setItem("products", JSON.stringify(data));
+      populateWithProducts();
+    });
 });
